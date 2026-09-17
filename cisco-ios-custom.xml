@@ -3,7 +3,7 @@
 Cisco IOS Custom Decoders for Wazuh
 Repository: wazuh-cisco-ios-decoders
 License: MIT
-Compatible: Wazuh 4.14+
+Compatible: Wazuh
 Author: Sadequzzaman Shohan
 
 Supported Events:
