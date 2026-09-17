@@ -1,0 +1,77 @@
+<!--
+===============================================================================
+Cisco IOS Custom Decoders for Wazuh
+Repository: wazuh-cisco-ios-decoders
+License: MIT
+Compatible: Wazuh 4.14+
+Author: Sadequzzaman Shohan
+
+Supported Events:
+- ACL Traffic Logs
+- Login Success
+- Login Failure
+- INVALID_FRAG_LENGTH Packet Drops
+===============================================================================
+-->
+
+<!-- ========================================================= -->
+<!-- Cisco IOS ACL Traffic Decoder -->
+<!-- ========================================================= -->
+
+<decoder name="cisco-ios-acl-traffic">
+  <parent>cisco-ios</parent>
+  <prematch>%FMANFP-6-IPACCESSLOGP:</prematch>
+
+  <regex type="pcre2">%(\w+)-(\d)-(\w+): list \S+ (\w+) (\w+) ([0-9]{1,3}(?:\.[0-9]{1,3}){3})\(([0-9]+)\)(?: \S+ \S+)? -> ([0-9]{1,3}(?:\.[0-9]{1,3}){3})\(([0-9]+)\)</regex>
+
+  <order>
+    cisco.facility,
+    cisco.severity,
+    cisco.mnemonic,
+    action,
+    protocol,
+    srcip,
+    srcport,
+    dstip,
+    dstport
+  </order>
+</decoder>
+
+<!-- ========================================================= -->
+<!-- Cisco INVALID_FRAG_LENGTH Packet Drop Decoder -->
+<!-- ========================================================= -->
+
+<decoder name="cisco-ios-invalid-frag">
+  <parent>cisco-ios</parent>
+  <prematch>INVALID_FRAG_LENGTH</prematch>
+
+  <regex type="pcre2">Dropping TCP packet\s+([0-9]{1,3}(?:\.[0-9]{1,3}){3}):([0-9]+)\s*=&gt;\s*([0-9]{1,3}(?:\.[0-9]{1,3}){3}):([0-9]+)</regex>
+
+  <order>srcip,srcport,dstip,dstport</order>
+</decoder>
+
+<!-- ========================================================= -->
+<!-- Cisco Login Failed Decoder -->
+<!-- ========================================================= -->
+
+<decoder name="cisco-ios-login-failed">
+  <parent>cisco-ios</parent>
+  <prematch offset="after_parent">LOGIN_FAILED</prematch>
+
+  <regex offset="after_parent">user:\s*(\S+).*Source:\s*([0-9]{1,3}(?:\.[0-9]{1,3}){3}).*localport:\s*(\d+)</regex>
+
+  <order>user,srcip,localport</order>
+</decoder>
+
+<!-- ========================================================= -->
+<!-- Cisco Login Success Decoder -->
+<!-- ========================================================= -->
+
+<decoder name="cisco-ios-login-success">
+  <parent>cisco-ios</parent>
+  <prematch offset="after_parent">LOGIN_SUCCESS</prematch>
+
+  <regex offset="after_parent">user:\s*(\S+).*Source:\s*([0-9]{1,3}(?:\.[0-9]{1,3}){3}).*localport:\s*(\d+)</regex>
+
+  <order>user,srcip,localport</order>
+</decoder>
